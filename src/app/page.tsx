@@ -71,7 +71,7 @@ export default function Component() {
                 <Zap className="h-12 w-12" />
                 <h2 className="text-xl font-bold">Real-time Analytics</h2>
                 <p className="text-gray-500 dark:text-gray-400">
-                  Get instant insights into your event's performance with our powerful analytics tools.
+                  Get instant insights into your event&apos;s performance with our powerful analytics tools.
                 </p>
               </div>
             </div>
