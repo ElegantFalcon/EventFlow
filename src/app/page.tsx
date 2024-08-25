@@ -1,33 +1,57 @@
+"use client"
+import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Calendar, Users, Zap, ChevronRight, Menu } from "lucide-react"
 import { MarqueeDemo } from "@/components/MarqueeDemo"
 
 export default function Component() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
   return (
     <div className="flex flex-col min-h-[100dvh]">
-      <header className="px-4 lg:px-6 h-14 flex items-center">
+     <header className="px-4 lg:px-6 h-14 flex items-center">
         <Link className="flex items-center justify-center" href="#">
           <Calendar className="h-6 w-6" />
           <span className="ml-2 text-lg font-bold">EventFlow</span>
         </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
-            Features
-          </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
-            Pricing
-          </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
-            View Events
-          </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
-            Login
-          </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
-            Sign Up
-          </Link>
+        <nav className="ml-auto flex items-center gap-4 sm:gap-6">
+          <div className="hidden md:flex gap-6">
+            <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
+              Features
+            </Link>
+            <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
+              Pricing
+            </Link>
+            <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
+              View Events
+            </Link>
+          </div>
+          <Button asChild>
+            <Link href="#">Login / Sign Up</Link>
+          </Button>
+          <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon" className="md:hidden">
+                <Menu className="h-6 w-6" />
+                <span className="sr-only">Toggle menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right">
+              <nav className="flex flex-col gap-4">
+                <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
+                  Features
+                </Link>
+                <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
+                  Pricing
+                </Link>
+                <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
+                  View Events
+                </Link>
+              </nav>
+            </SheetContent>
+          </Sheet>
         </nav>
       </header>
       <main className="flex-1">
