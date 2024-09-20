@@ -6,6 +6,7 @@ import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Calendar, Moon, Sun, Search, MapPin, Users } from "lucide-react"
+import Image from "next/image"
 
 export default function EventsPage() {
   const [isDarkMode, setIsDarkMode] = useState(false)
@@ -94,7 +95,7 @@ export default function EventsPage() {
                 } backdrop-blur-md`}
               >
                 <div className="flex-shrink-0">
-                  <img className="h-48 w-full object-cover" src={event.image} alt={event.name} />
+                  <Image className="h-48 w-full object-cover" src={event.image} alt={event.name} />
                 </div>
                 <div className="flex-1 p-6 flex flex-col justify-between">
                   <div className="flex-1">
