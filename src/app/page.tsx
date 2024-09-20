@@ -17,6 +17,8 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import Image from "next/image";
+import Navbar from "@/components/navbar";
 
 export default function EnhancedLandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -34,124 +36,7 @@ export default function EnhancedLandingPage() {
           : "bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 text-gray-900"
       }`}
     >
-      <header
-        className={`px-4 lg:px-6 h-14 flex items-center border-b ${
-          isDarkMode
-            ? "border-gray-700 bg-gray-900/50"
-            : "border-gray-200 bg-white/50"
-        } backdrop-blur-md`}
-      >
-        <Link className="flex items-center justify-center" href="#">
-          <Calendar
-            className={`h-6 w-6 ${
-              isDarkMode ? "text-indigo-400" : "text-indigo-600"
-            }`}
-          />
-          <span
-            className={`ml-2 text-lg font-bold ${
-              isDarkMode ? "text-gray-100" : "text-gray-900"
-            }`}
-          >
-            EventFlow
-          </span>
-        </Link>
-        <nav className="ml-auto flex items-center gap-4 sm:gap-6">
-          <div className="hidden md:flex gap-6">
-            <Link
-              className={`text-sm font-medium ${
-                isDarkMode
-                  ? "text-gray-300 hover:text-indigo-400"
-                  : "text-gray-900 hover:text-indigo-600"
-              } transition-colors`}
-              href="#"
-            >
-              Features
-            </Link>
-            <Link
-              className={`text-sm font-medium ${
-                isDarkMode
-                  ? "text-gray-300 hover:text-indigo-400"
-                  : "text-gray-900 hover:text-indigo-600"
-              } transition-colors`}
-              href="#"
-            >
-              Pricing
-            </Link>
-            <Link
-              className={`text-sm font-medium ${
-                isDarkMode
-                  ? "text-gray-300 hover:text-indigo-400"
-                  : "text-gray-900 hover:text-indigo-600"
-              } transition-colors`}
-              href="#"
-            >
-              Events
-            </Link>
-          </div>
-          <Button
-            asChild
-            className={
-              isDarkMode
-                ? "bg-indigo-600 hover:bg-indigo-700"
-                : "bg-indigo-600 hover:bg-indigo-700 text-white"
-            }
-          >
-            <Link href="#">Login / Sign Up</Link>
-          </Button>
-          <Button variant="ghost" size="icon" onClick={toggleTheme}>
-            {isDarkMode ? (
-              <Sun className="h-5 w-5" />
-            ) : (
-              <Moon className="h-5 w-5" />
-            )}
-          </Button>
-          <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon" className="md:hidden">
-                <Menu className="h-6 w-6" />
-                <span className="sr-only">Toggle menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent
-              side="right"
-              className={isDarkMode ? "bg-gray-800 text-gray-100" : "bg-white"}
-            >
-              <nav className="flex flex-col gap-4">
-                <Link
-                  className={`text-sm font-medium ${
-                    isDarkMode
-                      ? "hover:text-indigo-400"
-                      : "hover:text-indigo-600"
-                  } transition-colors`}
-                  href="#"
-                >
-                  Features
-                </Link>
-                <Link
-                  className={`text-sm font-medium ${
-                    isDarkMode
-                      ? "hover:text-indigo-400"
-                      : "hover:text-indigo-600"
-                  } transition-colors`}
-                  href="#"
-                >
-                  Pricing
-                </Link>
-                <Link
-                  className={`text-sm font-medium ${
-                    isDarkMode
-                      ? "hover:text-indigo-400"
-                      : "hover:text-indigo-600"
-                  } transition-colors`}
-                  href="#"
-                >
-                  Events
-                </Link>
-              </nav>
-            </SheetContent>
-          </Sheet>
-        </nav>
-      </header>
+      <Navbar isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
           <div className="container px-4 md:px-6">
@@ -373,7 +258,7 @@ export default function EnhancedLandingPage() {
                     isDarkMode ? "bg-gray-800/50" : "bg-gray-100/50"
                   } backdrop-blur-md`}
                 >
-                  <img
+                  <Image
                     alt={`${testimonial.name} avatar`}
                     className="rounded-full"
                     height="100"
@@ -397,7 +282,7 @@ export default function EnhancedLandingPage() {
                         isDarkMode ? "text-gray-300" : "text-gray-700"
                       }`}
                     >
-                      "{testimonial.text}"
+                      &quot;{testimonial.text}&quot;
                     </p>
                   </div>
                 </motion.div>

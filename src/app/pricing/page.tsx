@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Calendar, Moon, Sun, Check } from "lucide-react";
+import Navbar from "@/components/navbar";
 
 export default function PricingPage() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -51,67 +52,7 @@ export default function PricingPage() {
           : "bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 text-gray-900"
       }`}
     >
-      <header
-        className={`px-4 lg:px-6 h-14 flex items-center border-b ${
-          isDarkMode
-            ? "border-gray-700 bg-gray-900/50"
-            : "border-gray-200 bg-white/50"
-        } backdrop-blur-md`}
-      >
-        <Link className="flex items-center justify-center" href="/">
-          <Calendar
-            className={`h-6 w-6 ${
-              isDarkMode ? "text-indigo-400" : "text-indigo-600"
-            }`}
-          />
-          <span
-            className={`ml-2 text-lg font-bold ${
-              isDarkMode ? "text-gray-100" : "text-gray-900"
-            }`}
-          >
-            EventFlow
-          </span>
-        </Link>
-        <nav className="ml-auto flex items-center gap-4 sm:gap-6">
-          <Link
-            className={`text-sm font-medium ${
-              isDarkMode
-                ? "text-gray-300 hover:text-indigo-400"
-                : "text-gray-900 hover:text-indigo-600"
-            } transition-colors`}
-            href="#"
-          >
-            Features
-          </Link>
-          <Link
-            className={`text-sm font-medium ${
-              isDarkMode
-                ? "text-gray-300 hover:text-indigo-400"
-                : "text-gray-900 hover:text-indigo-600"
-            } transition-colors`}
-            href="#"
-          >
-            Events
-          </Link>
-          <Button
-            asChild
-            className={
-              isDarkMode
-                ? "bg-indigo-600 hover:bg-indigo-700"
-                : "bg-indigo-600 hover:bg-indigo-700 text-white"
-            }
-          >
-            <Link href="#">Login / Sign Up</Link>
-          </Button>
-          <Button variant="ghost" size="icon" onClick={toggleTheme}>
-            {isDarkMode ? (
-              <Sun className="h-5 w-5" />
-            ) : (
-              <Moon className="h-5 w-5" />
-            )}
-          </Button>
-        </nav>
-      </header>
+      <Navbar isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
       <main className="flex-1 py-12">
         <div className="container px-4 md:px-6">
           <motion.div
