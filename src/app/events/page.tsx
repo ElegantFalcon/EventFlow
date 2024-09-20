@@ -4,21 +4,28 @@ import { useState } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { Calendar, Moon, Sun, Users, Zap, BarChart, Globe, Shield } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Calendar, Moon, Sun, Search, MapPin, Users } from "lucide-react"
 
-export default function FeaturesPage() {
+export default function EventsPage() {
   const [isDarkMode, setIsDarkMode] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("")
 
   const toggleTheme = () => setIsDarkMode(!isDarkMode)
 
-  const features = [
-    { icon: Calendar, title: "Easy Scheduling", description: "Create and manage events effortlessly with our intuitive scheduling tools." },
-    { icon: Users, title: "Attendee Management", description: "Keep track of your attendees, send invitations, and manage RSVPs all in one place." },
-    { icon: Zap, title: "Real-time Analytics", description: "Get instant insights into your event's performance with our powerful analytics tools." },
-    { icon: BarChart, title: "Customizable Reports", description: "Generate detailed reports tailored to your specific needs and preferences." },
-    { icon: Globe, title: "Multi-language Support", description: "Reach a global audience with our multi-language event pages and communications." },
-    { icon: Shield, title: "Advanced Security", description: "Protect your events and attendee data with our state-of-the-art security measures." },
+  const events = [
+    { id: 1, name: "Tech Conference 2023", date: "2023-09-15", location: "San Francisco, CA", attendees: 500, image: "/placeholder.svg?height=400&width=600" },
+    { id: 2, name: "Music Festival", date: "2023-07-22", location: "New York, NY", attendees: 10000, image: "/placeholder.svg?height=400&width=600" },
+    { id: 3, name: "Food & Wine Expo", date: "2023-08-05", location: "Chicago, IL", attendees: 2000, image: "/placeholder.svg?height=400&width=600" },
+    { id: 4, name: "Art Gallery Opening", date: "2023-10-01", location: "Los Angeles, CA", attendees: 300, image: "/placeholder.svg?height=400&width=600" },
+    { id: 5, name: "Startup Pitch Competition", date: "2023-11-12", location: "Boston, MA", attendees: 150, image: "/placeholder.svg?height=400&width=600" },
+    { id: 6, name: "Wellness Retreat", date: "2023-09-30", location: "Sedona, AZ", attendees: 50, image: "/placeholder.svg?height=400&width=600" },
   ]
+
+  const filteredEvents = events.filter(event =>
+    event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    event.location.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   return (
     <div className={`flex flex-col min-h-screen ${
@@ -35,10 +42,10 @@ export default function FeaturesPage() {
         </Link>
         <nav className="ml-auto flex items-center gap-4 sm:gap-6">
           <Link className={`text-sm font-medium ${isDarkMode ? 'text-gray-300 hover:text-indigo-400' : 'text-gray-900 hover:text-indigo-600'} transition-colors`} href="#">
-            Pricing
+            Features
           </Link>
           <Link className={`text-sm font-medium ${isDarkMode ? 'text-gray-300 hover:text-indigo-400' : 'text-gray-900 hover:text-indigo-600'} transition-colors`} href="#">
-            Events
+            Pricing
           </Link>
           <Button asChild className={isDarkMode ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}>
             <Link href="#">Login / Sign Up</Link>
@@ -57,39 +64,63 @@ export default function FeaturesPage() {
             className="text-center mb-12"
           >
             <h1 className={`text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              Powerful Features for Seamless Event Management
+              Upcoming Events
             </h1>
             <p className={`mt-4 mx-auto max-w-[700px] text-lg ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-              Discover how EventFlow can revolutionize your event planning and management process.
+              Discover and join exciting events in your area.
             </p>
           </motion.div>
+          <div className="mb-8 flex justify-center">
+            <div className="relative w-full max-w-md">
+              <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+              <Input
+                type="search"
+                placeholder="Search events..."
+                className={`pl-10 ${isDarkMode ? 'bg-gray-700/50 border-gray-600 text-gray-100 placeholder-gray-400' : 'bg-white/50 border-gray-300 text-gray-900 placeholder-gray-500'}`}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature, index) => (
+            {filteredEvents.map((event, index) => (
               <motion.div
-                key={feature.title}
+                key={event.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className={`flex flex-col items-center text-center p-6 rounded-lg shadow-lg ${
+                className={`flex flex-col rounded-lg shadow-lg overflow-hidden ${
                   isDarkMode ? 'bg-gray-800/50' : 'bg-white/50'
                 } backdrop-blur-md`}
               >
-                <feature.icon className={`h-12 w-12 mb-4 ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`} />
-                <h2 className={`text-xl font-bold mb-2 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>{feature.title}</h2>
-                <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>{feature.description}</p>
+                <div className="flex-shrink-0">
+                  <img className="h-48 w-full object-cover" src={event.image} alt={event.name} />
+                </div>
+                <div className="flex-1 p-6 flex flex-col justify-between">
+                  <div className="flex-1">
+                    <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>{event.name}</h2>
+                    <p className={`mt-3 text-base ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      <Calendar className="inline-block mr-2 h-5 w-5" />
+                      {event.date}
+                    </p>
+                    <p className={`mt-3 text-base ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      <MapPin className="inline-block mr-2 h-5 w-5" />
+                      {event.location}
+                    </p>
+                    <p className={`mt-3 text-base ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      <Users className="inline-block mr-2 h-5 w-5" />
+                      {event.attendees} attendees
+                    </p>
+                  </div>
+                  <div className="mt-6">
+                    <Button className={`w-full ${isDarkMode ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}`}>
+                      Register Now
+                    </Button>
+                  </div>
+                </div>
               </motion.div>
             ))}
           </div>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.6 }}
-            className="mt-12 text-center"
-          >
-            <Button className={`${isDarkMode ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}`}>
-              Get Started Now
-            </Button>
-          </motion.div>
         </div>
       </main>
       <footer className={`border-t py-4 px-4 lg:px-6 ${isDarkMode ? 'bg-gray-900/50 border-gray-700' : 'bg-white/50 border-gray-200'} backdrop-blur-md`}>
