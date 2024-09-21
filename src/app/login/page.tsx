@@ -17,15 +17,72 @@ import {
   ArrowRight,
 } from "lucide-react";
 import Navbar from "@/components/navbar";
+import { supabase } from "@/lib/supabaseClient";
+import { useRouter } from "next/navigation";
 
 export default function LoginSignupPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [userType, setUserType] = useState("user");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const router = useRouter();
 
   const toggleMode = () => setIsLogin(!isLogin);
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); // Prevent default form submission behavior
+
+    if (isLogin) {
+      // Handle login logic
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        console.error("Login error:", error.message);
+      } else {
+        // Fetch user details from users table
+        const { data: userProfile, error: fetchError } = await supabase
+          .from("users") // Adjust to your actual table name
+          .select("*")
+          .eq("email", email)
+          .single();
+
+        if (fetchError) {
+          console.error("Fetch user error:", fetchError.message);
+        } else {
+          // Redirect based on user type
+          if (userProfile?.user_type === "admin") {
+            router.push("/admin"); // Redirect to admin dashboard
+          } else {
+            router.push("/events"); // Redirect to user events page
+          }
+        }
+      }
+    } else {
+      // Handle signup logic
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (signupError) {
+        console.error("Signup error:", signupError.message);
+      } else {
+        const user = data.user; // Access the user from the data property
+      
+        // After signup, insert user details into users table
+        const { error: userError } = await supabase
+          .from("users") // Adjust to your actual table name
+          .insert([{ id: user.id, email, name: name, user_type:userType }]); // Use user.id as UUID
+      
+        if (userError) {
+          console.error("User creation error:", userError.message);
+        } else {
+          router.push("/events"); // Redirect to events page after signup
+        }
+      }
+      
   return (
     <div
       className={`flex flex-col min-h-screen ${
@@ -52,7 +109,7 @@ export default function LoginSignupPage() {
           >
             {isLogin ? "Login to EventFlow" : "Sign Up for EventFlow"}
           </h1>
-          <form className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <RadioGroup
               defaultValue="user"
               className="flex justify-center space-x-4 mb-4"
@@ -94,6 +151,8 @@ export default function LoginSignupPage() {
                   <Input
                     id="name"
                     type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                     placeholder="Enter your name"
                     className={`pl-10 ${
                       isDarkMode
@@ -120,6 +179,8 @@ export default function LoginSignupPage() {
                 <Input
                   id="email"
                   type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
                   className={`pl-10 ${
                     isDarkMode
@@ -145,6 +206,8 @@ export default function LoginSignupPage() {
                 <Input
                   id="password"
                   type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   className={`pl-10 ${
                     isDarkMode
