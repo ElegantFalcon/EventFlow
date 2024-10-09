@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState,useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion } from "framer-motion"
@@ -10,10 +10,12 @@ import { Calendar, Moon, Sun } from "lucide-react"
 interface NavbarProps {
   isDarkMode: boolean
   toggleTheme: () => void
+  username?: string;
 }
 
-export default function Navbar({ isDarkMode, toggleTheme }: NavbarProps) {
+export default function Navbar({ isDarkMode, toggleTheme}: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [username, setUsername] = useState<string | null>(null);
   const pathname = usePathname()
 
   const navItems = [
@@ -21,7 +23,11 @@ export default function Navbar({ isDarkMode, toggleTheme }: NavbarProps) {
     { name: "Pricing", href: "/pricing" },
     { name: "Events", href: "/events" },
   ]
-
+  useEffect(() => {
+    // Check session storage for username on component mount
+    const storedUsername = sessionStorage.getItem("username");
+    setUsername(storedUsername);
+  }, []);
   return (
     <header className={`px-4 lg:px-6 h-14 flex items-center border-b ${
       isDarkMode ? 'border-gray-700 bg-gray-900/50' : 'border-gray-200 bg-white/50'
@@ -106,9 +112,20 @@ export default function Navbar({ isDarkMode, toggleTheme }: NavbarProps) {
                 {item.name}
               </Link>
             ))}
-            <Button asChild className={isDarkMode ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}>
-              <Link href="/login" onClick={() => setIsMenuOpen(false)}>Login / Sign Up</Link>
-            </Button>
+           {username ? (
+              <Button asChild className={`bg-indigo-600 hover:bg-indigo-700 ${!isDarkMode ? 'text-white' : ''}`}>
+                <Link href="/profile" onClick={() => setIsMenuOpen(false)}>
+                  {username}
+                </Link>
+              </Button>
+            ) : (
+              <Button asChild className={`bg-indigo-600 hover:bg-indigo-700 ${!isDarkMode ? 'text-white' : ''}`}>
+                <Link href="/login" onClick={() => setIsMenuOpen(false)}>
+                  Login / Sign Up
+                </Link>
+              </Button>
+            )}
+
           </nav>
         </motion.div>
       )}
