@@ -50,7 +50,7 @@ export default function ProfilePage() {
         {/* Profile Header */}
         <div className="flex items-center justify-center flex-col space-y-2">
           <UserCircle className="h-24 w-24 text-indigo-600" />
-          <h1 className="text-3xl font-bold text-gray-900">{username}'s Profile</h1>
+          <h1 className="text-3xl font-bold text-gray-900">{username}&apos;s Profile</h1>
           <p className="text-gray-500">Manage your account information</p>
         </div>
 
@@ -94,7 +94,7 @@ export default function ProfilePage() {
             <Link href="/">Back to Home</Link>
           </Button>
           <Button asChild className="w-full bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg py-2 px-4">
-            <Link href="/logout">Logout</Link>
+            <Link href="/events">Logout</Link>
           </Button>
         </div>
       </div>
