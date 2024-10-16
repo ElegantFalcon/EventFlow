@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Calendar, Moon, Sun, Search, MapPin, Users } from "lucide-react";
+import { Calendar, Moon, Sun, Search, MapPin, Users, Building } from "lucide-react";
 import Image from "next/image";
 import Navbar from "@/components/navbar";
 
@@ -22,7 +22,8 @@ export default function EventsPage() {
       date: "2023-09-15",
       location: "San Francisco, CA",
       attendees: 500,
-      image: "/placeholder.svg",
+      organizer: "Tech Events Inc.",
+      image: "https://bnrrffmvjojnwlaxljmu.supabase.co/storage/v1/object/sign/event_img/images.jpg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJldmVudF9pbWcvaW1hZ2VzLmpwZyIsImlhdCI6MTcyOTA2NTMxMSwiZXhwIjoxNzI5NjcwMTExfQ.jXJOzNwDlwghUgYKLeDGBcPjALlo5zvBFXSx3fDO54o&t=2024-10-16T07%3A55%3A12.326Z",
       width: 500,
       height: 300,
     },
@@ -32,6 +33,7 @@ export default function EventsPage() {
       date: "2023-07-22",
       location: "New York, NY",
       attendees: 10000,
+      organizer: "Tech Events Inc.",
       image: "/placeholder.svg",
       width: 500,
       height: 300,
@@ -42,6 +44,7 @@ export default function EventsPage() {
       date: "2023-08-05",
       location: "Chicago, IL",
       attendees: 2000,
+      organizer: "Tech Events Inc.",
       image: "/placeholder.svg",
       width: 500,
       height: 300,
@@ -62,6 +65,7 @@ export default function EventsPage() {
       date: "2023-11-12",
       location: "Boston, MA",
       attendees: 150,
+      organizer: "Tech Events Inc.",
       image: "/placeholder.svg",
       width: 500,
       height: 300,
@@ -72,6 +76,7 @@ export default function EventsPage() {
       date: "2023-09-30",
       location: "Sedona, AZ",
       attendees: 50,
+      organizer: "Tech Events Inc.",
       image: "/placeholder.svg",
       width: 500,
       height: 300,
@@ -189,6 +194,14 @@ export default function EventsPage() {
                     >
                       <Users className="inline-block mr-2 h-5 w-5" />
                       {event.attendees} attendees
+                    </p>
+                    <p
+                      className={`mt-3 text-base ${
+                        isDarkMode ? "text-gray-300" : "text-gray-600"
+                      }`}
+                    >
+                      <Building className="inline-block mr-2 h-5 w-5" />
+                      {event.organizer} 
                     </p>
                   </div>
                   <div className="mt-6">

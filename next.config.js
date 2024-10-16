@@ -1,8 +1,6 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+// next.config.js
+module.exports = {
   images: {
-    domains: ['avatar.vercel.sh'],  // Add this line
+    domains: ['bnrrffmvjojnwlaxljmu.supabase.co'], // Add your image domain here
   },
 }
-
-module.exports = nextConfig;
