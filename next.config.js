@@ -1,4 +1,4 @@
-/** @type {import('next').NextConfig} */
+ @type {import('next').NextConfig} 
 const nextConfig = {
   images: {
     domains: ['avatar.vercel.sh'],  // Add this line
@@ -6,3 +6,6 @@ const nextConfig = {
 }
 
 module.exports = nextConfig;
+
+
+
