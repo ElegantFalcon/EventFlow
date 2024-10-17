@@ -474,7 +474,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Calendar, Search, MapPin, Users } from "lucide-react";
-// import Image from "next/image"; // Commenting out the Image import
+//import Image from "next/image"; // Commenting out the Image import
 import Navbar from "@/components/navbar";
 import { createClient } from "@supabase/supabase-js";
 
