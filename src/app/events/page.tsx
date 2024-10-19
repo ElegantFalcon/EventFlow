@@ -1,93 +1,81 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Calendar, Moon, Sun, Search, MapPin, Users, Building } from "lucide-react";
+import { Calendar, Search, MapPin, Users, Building } from "lucide-react";
 import Image from "next/image";
 import Navbar from "@/components/navbar";
+import { supabase } from "@/lib/supabaseClient"; // Adjust the path as necessary
+import { useRouter } from "next/navigation";
+interface Event {
+  id: string; // UUIDs are typically strings
+  name: string;
+  description?: string;
+  location: string;
+  date: string; // Adjust based on your actual data type if needed
+  image: string;
+  attendees?: number;
+  width?: number;
+  height?: number;
+  organizer?: string;
+}
 
 export default function EventsPage() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [events, setEvents] = useState<Event[]>([]); // State to hold fetched events
+  const router = useRouter(); // Initialize router for navigation
 
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
-  const events = [
-    {
-      id: 1,
-      name: "Tech Conference 2023",
-      date: "2023-09-15",
-      location: "San Francisco, CA",
-      attendees: 500,
-      organizer: "Tech Events Inc.",
-      image: "https://bnrrffmvjojnwlaxljmu.supabase.co/storage/v1/object/sign/event_img/images.jpg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJldmVudF9pbWcvaW1hZ2VzLmpwZyIsImlhdCI6MTcyOTA2NTMxMSwiZXhwIjoxNzI5NjcwMTExfQ.jXJOzNwDlwghUgYKLeDGBcPjALlo5zvBFXSx3fDO54o&t=2024-10-16T07%3A55%3A12.326Z",
-      width: 500,
-      height: 300,
-    },
-    {
-      id: 2,
-      name: "Music Festival",
-      date: "2023-07-22",
-      location: "New York, NY",
-      attendees: 10000,
-      organizer: "Tech Events Inc.",
-      image: "/placeholder.svg",
-      width: 500,
-      height: 300,
-    },
-    {
-      id: 3,
-      name: "Food & Wine Expo",
-      date: "2023-08-05",
-      location: "Chicago, IL",
-      attendees: 2000,
-      organizer: "Tech Events Inc.",
-      image: "/placeholder.svg",
-      width: 500,
-      height: 300,
-    },
-    {
-      id: 4,
-      name: "Art Gallery Opening",
-      date: "2023-10-01",
-      location: "Los Angeles, CA",
-      attendees: 300,
-      image: "/placeholder.svg",
-      width: 500,
-      height: 300,
-    },
-    {
-      id: 5,
-      name: "Startup Pitch Competition",
-      date: "2023-11-12",
-      location: "Boston, MA",
-      attendees: 150,
-      organizer: "Tech Events Inc.",
-      image: "/placeholder.svg",
-      width: 500,
-      height: 300,
-    },
-    {
-      id: 6,
-      name: "Wellness Retreat",
-      date: "2023-09-30",
-      location: "Sedona, AZ",
-      attendees: 50,
-      organizer: "Tech Events Inc.",
-      image: "/placeholder.svg",
-      width: 500,
-      height: 300,
-    },
-  ];
+  useEffect(() => {
+    const fetchEvents = async () => {
+      const { data, error } = await supabase.from("events").select("*");
+
+      if (error) {
+        console.error("Error fetching events:", error);
+      } else {
+        setEvents(data || []); // Set the fetched events to state
+      }
+    };
+
+    fetchEvents();
+  }, []);
 
   const filteredEvents = events.filter(
     (event) =>
       event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       event.location.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleRegister = async (eventId: string) => {
+    const userEmail = sessionStorage.getItem("email"); // Get the user's email from session storage
+
+    if (!userEmail) {
+      console.error("User email not found in session storage.");
+      return; // You may want to handle this scenario with a message or redirect
+    }
+
+    // Register the user for the event
+    const { data, error } = await supabase.from("registrations").insert([
+      {
+        event_id: eventId,
+        user_email: userEmail,
+        // Add additional fields if needed
+      },
+    ]);
+
+    if (error) {
+      console.error("Error registering for event:", error);
+      return; // You may want to show an error message to the user
+    }
+
+    // Redirect to success page
+    router.push("/success"); // Adjust the path as necessary
+  };
 
   return (
     <div
@@ -156,10 +144,10 @@ export default function EventsPage() {
                 <div className="flex-shrink-0">
                   <Image
                     className="h-48 w-full object-cover"
-                    src={event.image}
+                    src=""// Use event image for the image source
                     alt={event.name}
-                    width={event.width}
-                    height={event.height}
+                    width={event.width || 500}
+                    height={event.height || 300}
                   />
                 </div>
                 <div className="flex-1 p-6 flex flex-col justify-between">
@@ -177,7 +165,8 @@ export default function EventsPage() {
                       }`}
                     >
                       <Calendar className="inline-block mr-2 h-5 w-5" />
-                      {event.date}
+                      {new Date(event.date).toLocaleDateString()}{" "}
+                      {/* Format the date */}
                     </p>
                     <p
                       className={`mt-3 text-base ${
@@ -193,16 +182,18 @@ export default function EventsPage() {
                       }`}
                     >
                       <Users className="inline-block mr-2 h-5 w-5" />
-                      {event.attendees} attendees
+                      {event.attendees || 0} attendees
                     </p>
-                    <p
-                      className={`mt-3 text-base ${
-                        isDarkMode ? "text-gray-300" : "text-gray-600"
-                      }`}
-                    >
-                      <Building className="inline-block mr-2 h-5 w-5" />
-                      {event.organizer} 
-                    </p>
+                    {event.organizer && (
+                      <p
+                        className={`mt-3 text-base ${
+                          isDarkMode ? "text-gray-300" : "text-gray-600"
+                        }`}
+                      >
+                        <Building className="inline-block mr-2 h-5 w-5" />
+                        {event.organizer}
+                      </p>
+                    )}
                   </div>
                   <div className="mt-6">
                     <Button
@@ -211,6 +202,7 @@ export default function EventsPage() {
                           ? "bg-indigo-600 hover:bg-indigo-700"
                           : "bg-indigo-600 hover:bg-indigo-700 text-white"
                       }`}
+                      onClick={() => handleRegister(event.id)} // Pass event ID to registration handler
                     >
                       Register Now
                     </Button>
