@@ -13,10 +13,19 @@ import { supabase } from "@/lib/supabaseClient";
 
 export default function RegistrationSuccessful() {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const searchParams = useSearchParams();
-  const registrationId = searchParams.get("registrationId"); // Get the registration ID from the query string
+  const [registrationId, setRegistrationId] = useState<string | null>(null); // Specify type here
 
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
+  
+    useEffect(() => {
+    // Retrieve registration ID from local storage
+    const storedId = localStorage.getItem('registrationId');
+    if (storedId) {
+      setRegistrationId(storedId);
+      localStorage.removeItem('registrationId'); // Clean up if needed
+    }
+  }, []);
+
 
   useEffect(() => {
     // Confetti animation

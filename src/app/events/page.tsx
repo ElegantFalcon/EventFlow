@@ -10,8 +10,7 @@ import Image from "next/image";
 import Navbar from "@/components/navbar";
 import { supabase } from "@/lib/supabaseClient"; // Adjust the path as necessary
 import { useRouter } from "next/navigation";
-import { jsPDF } from "jspdf";
-import QRCode from "qrcode";
+
 import defaultImg from "../../assets/default.jpg"; // Go up two levels to reach the assets folder
 
 interface Event {
@@ -26,7 +25,6 @@ interface Event {
   height?: number;
   organizer?: string;
 }
-
 
 export default function EventsPage() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -58,41 +56,45 @@ export default function EventsPage() {
 
   const handleRegister = async (eventId: string) => {
     const userEmail = sessionStorage.getItem("email");
-  
+
     if (!userEmail) {
       console.error("User email not found in session storage.");
       return;
     }
-  
+
     const { data: eventCurrent, error: eventFetchError } = await supabase
       .from("events")
       .select("attendees")
       .eq("id", eventId)
       .single();
-  
+
     if (eventFetchError || eventCurrent.attendees <= 0) {
       console.error("Error fetching event data or no more attendees allowed.");
       return;
     }
-  
+
     const { data: registrationData, error: registrationError } = await supabase
       .from("registrations")
       .insert([{ event_id: eventId, user_email: userEmail }])
       .select()
       .single();
-  
+
     if (registrationError) {
       console.error("Error registering for event:", registrationError);
       return;
     }
-  
+
     const updatedAttendeesCount = eventCurrent.attendees - 1;
-    await supabase.from("events").update({ attendees: updatedAttendeesCount }).eq("id", eventId);
-  
+    await supabase
+      .from("events")
+      .update({ attendees: updatedAttendeesCount })
+      .eq("id", eventId);
+
     // Redirect to the success page, and pass the registration ID for later use
-    router.push(`/success?registrationId=${registrationData.id}`);
+    localStorage.setItem("registrationId", registrationData.id);
+    router.push("/success");
   };
-  
+
   return (
     <div
       className={`flex flex-col min-h-screen ${
@@ -160,7 +162,11 @@ export default function EventsPage() {
                 <div className="flex-shrink-0">
                   <Image
                     className="h-48 w-full object-cover"
-                    src={event.image && event.image.startsWith("http") ? event.image : defaultImg }
+                    src={
+                      event.image && event.image.startsWith("http")
+                        ? event.image
+                        : defaultImg
+                    }
                     // Ensure a valid image source
                     alt={event.name || "Event Image"} // Provide an alt text
                     width={event.width || 500}
