@@ -6,11 +6,12 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Calendar, Moon, Sun, Check } from "lucide-react";
 import Navbar from "@/components/navbar";
-
+import { useRouter } from "next/navigation";
 export default function PricingPage() {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
+  const router=useRouter();
 
   const plans = [
     {
@@ -126,6 +127,8 @@ export default function PricingPage() {
                       ? "bg-indigo-600 hover:bg-indigo-700"
                       : "bg-indigo-600 hover:bg-indigo-700 text-white"
                   }`}
+                  onClick={()=>router.push("/features")}
+
                 >
                   Get Started
                 </Button>

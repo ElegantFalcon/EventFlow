@@ -24,10 +24,11 @@ export default function Navbar({ isDarkMode, toggleTheme}: NavbarProps) {
     { name: "Events", href: "/events" },
   ]
   useEffect(() => {
-    // Check session storage for username on component mount
-    const storedUsername = sessionStorage.getItem("username");
+    // Check local storage for username on component mount
+    const storedUsername = localStorage.getItem("name");
     setUsername(storedUsername);
   }, []);
+
   return (
     <header className={`px-4 lg:px-6 h-14 flex items-center border-b ${
       isDarkMode ? 'border-gray-700 bg-gray-900/50' : 'border-gray-200 bg-white/50'
@@ -54,9 +55,15 @@ export default function Navbar({ isDarkMode, toggleTheme}: NavbarProps) {
             {item.name}
           </Link>
         ))}
-        <Button asChild className={isDarkMode ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}>
-          <Link href="/login">Login / Sign Up</Link>
-        </Button>
+        {username ? (
+          <Button asChild className={isDarkMode ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}>
+            <Link href="/profile">Logged in as {username}</Link>
+          </Button>
+        ) : (
+          <Button asChild className={isDarkMode ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}>
+            <Link href="/login">Login / Sign Up</Link>
+          </Button>
+        )}
         <Button variant="ghost" size="icon" onClick={toggleTheme}>
           {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
         </Button>

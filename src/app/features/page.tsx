@@ -15,11 +15,12 @@ import {
   Shield,
 } from "lucide-react";
 import Navbar from "@/components/navbar";
-
+import { useRouter } from "next/navigation";
 export default function FeaturesPage() {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
+  const router = useRouter();
 
   const features = [
     {
@@ -134,6 +135,7 @@ export default function FeaturesPage() {
                   ? "bg-indigo-600 hover:bg-indigo-700"
                   : "bg-indigo-600 hover:bg-indigo-700 text-white"
               }`}
+              onClick={() => router.push("/login")}
             >
               Get Started Now
             </Button>

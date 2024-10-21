@@ -10,18 +10,23 @@ import Image from "next/image";
 import Navbar from "@/components/navbar";
 import { supabase } from "@/lib/supabaseClient"; // Adjust the path as necessary
 import { useRouter } from "next/navigation";
+import { jsPDF } from "jspdf";
+import QRCode from "qrcode";
+import defaultImg from "../../assets/default.jpg"; // Go up two levels to reach the assets folder
+
 interface Event {
-  id: string; // UUIDs are typically strings
+  id: string;
   name: string;
   description?: string;
   location: string;
-  date: string; // Adjust based on your actual data type if needed
+  date: string; // Assuming it's stored as a timestamp
   image: string;
   attendees?: number;
   width?: number;
   height?: number;
   organizer?: string;
 }
+
 
 export default function EventsPage() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -52,64 +57,42 @@ export default function EventsPage() {
   );
 
   const handleRegister = async (eventId: string) => {
-    const userEmail = sessionStorage.getItem("email"); // Get the user's email from session storage
+    const userEmail = sessionStorage.getItem("email");
   
     if (!userEmail) {
       console.error("User email not found in session storage.");
-      return; // Handle the scenario if email is not found
+      return;
     }
   
-    // Fetch the current event data to check the attendees count
     const { data: eventCurrent, error: eventFetchError } = await supabase
       .from("events")
       .select("attendees")
       .eq("id", eventId)
       .single();
   
-    if (eventFetchError) {
-      console.error("Error fetching event data:", eventFetchError);
-      return; // Handle error
+    if (eventFetchError || eventCurrent.attendees <= 0) {
+      console.error("Error fetching event data or no more attendees allowed.");
+      return;
     }
   
-    // Check if attendees count is greater than 0
-    if (eventCurrent.attendees <= 0) {
-      console.error("No more attendees can be registered for this event.");
-      return; // Handle scenario when attendees are 0 or less
-    }
-  
-    // Register the user for the event
-    const { data: registrationData, error: registrationError } = await supabase.from("registrations").insert([
-      {
-        event_id: eventId,
-        user_email: userEmail,
-        // Add additional fields if needed
-      },
-    ]);
+    const { data: registrationData, error: registrationError } = await supabase
+      .from("registrations")
+      .insert([{ event_id: eventId, user_email: userEmail }])
+      .select()
+      .single();
   
     if (registrationError) {
       console.error("Error registering for event:", registrationError);
-      return; // Handle the error appropriately
+      return;
     }
   
-    // Decrement the attendees count by 1
     const updatedAttendeesCount = eventCurrent.attendees - 1;
+    await supabase.from("events").update({ attendees: updatedAttendeesCount }).eq("id", eventId);
   
-    // Update the attendees count in the events table
-    const { data: eventData, error: eventError } = await supabase
-      .from("events")
-      .update({ attendees: updatedAttendeesCount }) // Set the updated attendees count
-      .eq("id", eventId);
-  
-    if (eventError) {
-      console.error("Error updating attendees count:", eventError);
-      return; // Handle the error appropriately
-    }
-  
-    // Redirect to success page
-    router.push("/success"); // Adjust the path as necessary
+    // Redirect to the success page, and pass the registration ID for later use
+    router.push(`/success?registrationId=${registrationData.id}`);
   };
   
-
   return (
     <div
       className={`flex flex-col min-h-screen ${
@@ -177,11 +160,14 @@ export default function EventsPage() {
                 <div className="flex-shrink-0">
                   <Image
                     className="h-48 w-full object-cover"
-                    src={event.image?.startsWith("http") ? event.image : "/default-image.jpg"} // Use a fallback image                    alt={event.name}
+                    src={event.image && event.image.startsWith("http") ? event.image : defaultImg }
+                    // Ensure a valid image source
+                    alt={event.name || "Event Image"} // Provide an alt text
                     width={event.width || 500}
                     height={event.height || 300}
                   />
                 </div>
+
                 <div className="flex-1 p-6 flex flex-col justify-between">
                   <div className="flex-1">
                     <h2

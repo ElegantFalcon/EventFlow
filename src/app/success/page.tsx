@@ -2,17 +2,25 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useSearchParams, useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import confetti  from "canvas-confetti"
+import confetti from "canvas-confetti"
 import { Button } from "@/components/ui/button"
 import { Calendar, Moon, Sun, Check } from "lucide-react"
+import jsPDF from "jspdf"
+import QRCode from "qrcode"
+import { supabase } from "@/lib/supabaseClient"
 
 export default function RegistrationSuccessful() {
   const [isDarkMode, setIsDarkMode] = useState(false)
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const registrationId = searchParams.get("registrationId") // Get the registration ID from the query string
 
   const toggleTheme = () => setIsDarkMode(!isDarkMode)
 
   useEffect(() => {
+    // Confetti animation
     const duration = 3 * 1000
     const animationEnd = Date.now() + duration
     const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 }
@@ -21,7 +29,7 @@ export default function RegistrationSuccessful() {
       return Math.random() * (max - min) + min
     }
 
-    const interval: NodeJS.Timeout = setInterval(function() {
+    const interval: NodeJS.Timeout = setInterval(function () {
       const timeLeft = animationEnd - Date.now()
 
       if (timeLeft <= 0) {
@@ -29,18 +37,74 @@ export default function RegistrationSuccessful() {
       }
 
       const particleCount = 50 * (timeLeft / duration)
-      confetti(Object.assign({}, defaults, { 
-        particleCount, 
-        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } 
-      }))
-      confetti(Object.assign({}, defaults, { 
-        particleCount, 
-        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } 
-      }))
+      confetti(
+        Object.assign({}, defaults, {
+          particleCount,
+          origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+        })
+      )
+      confetti(
+        Object.assign({}, defaults, {
+          particleCount,
+          origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+        })
+      )
     }, 250)
 
     return () => clearInterval(interval)
   }, [])
+
+  useEffect(() => {
+    const downloadPdf = async () => {
+      if (!registrationId) return
+
+      // Fetch registration and event details using Supabase
+      const { data: registrationData, error: registrationError } = await supabase
+        .from("registrations")
+        .select("event_id, user_email")
+        .eq("id", registrationId)
+        .single()
+
+      if (registrationError) {
+        console.error("Error fetching registration details:", registrationError)
+        return
+      }
+
+      const { data: eventData, error: eventError } = await supabase
+        .from("events")
+        .select("name, location, date")
+        .eq("id", registrationData.event_id)
+        .single()
+
+      if (eventError) {
+        console.error("Error fetching event details:", eventError)
+        return
+      }
+
+      // Generate QR code based on registrationId
+      const qrCodeUrl = await QRCode.toDataURL(registrationId)
+
+      // Create a PDF with jsPDF
+      const doc = new jsPDF()
+      doc.setFontSize(22)
+      doc.text("Event Registration Details", 20, 20)
+      doc.setFontSize(16)
+      doc.text(`Event: ${eventData.name}`, 20, 40)
+      doc.text(`Location: ${eventData.location}`, 20, 50)
+      doc.text(`Date: ${new Date(eventData.date).toLocaleDateString()}`, 20, 60)
+      doc.text(`Registered Email: ${registrationData.user_email}`, 20, 70)
+
+      // Add the QR code image to the PDF
+      doc.addImage(qrCodeUrl, "JPEG", 20, 80, 50, 50)
+
+      // Download the PDF after a short delay
+      setTimeout(() => {
+        doc.save("Event_Registration.pdf")
+      }, 2000) // 3-second delay
+    }
+
+    downloadPdf()
+  }, [registrationId])
 
   return (
     <div className={`flex flex-col min-h-screen ${
@@ -80,7 +144,7 @@ export default function RegistrationSuccessful() {
             Registration Successful!
           </h1>
           <p className={`text-lg mb-8 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-            Thank you for registering for the event. We look forward to seeing you there!
+            Thank you for registering for the event. Your event details will be downloaded shortly.
           </p>
           <Button asChild className={`${isDarkMode ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}`}>
             <Link href="/events">View All Events</Link>

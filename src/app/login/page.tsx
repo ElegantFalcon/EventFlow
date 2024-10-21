@@ -18,6 +18,9 @@ import {
 import Navbar from "@/components/navbar";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+
+
 
 
 // WARNING: This implementation stores passwords in plain text, which is a severe security risk.
@@ -31,6 +34,7 @@ export default function LoginSignupPage() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [username, setUsername] = useState<string | "">(""); 
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
 
  useEffect(() => {
@@ -44,6 +48,7 @@ export default function LoginSignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage(null); // Reset error message
 
     if (isLogin) {
       // Login logic
@@ -51,58 +56,57 @@ export default function LoginSignupPage() {
         .from("users")
         .select("*")
         .eq("email", email)
-        .eq("password", password)
+        .eq("password", password) // Plain text comparison (not recommended)
         .single();
 
       if (error) {
+        setErrorMessage("Login failed. Please try again.");
         console.error("Login error:", error.message);
-        // Handle login error (e.g., show error message to user)
       } else if (data) {
         // Login successful
-        setSession(data.id, data.email,data.password, data.user_type,data.name);
+        setSession(data.id, data.email, data.password, data.user_type, data.name);
         setUsername(data.name);
-        console.log(data.name);
         if (data.user_type === "admin") {
           router.push("/admin");
         } else {
           router.push("/events");
         }
       } else {
+        setErrorMessage("Invalid email or password.");
         console.error("Invalid email or password");
-        // Handle invalid credentials (e.g., show error message to user)
       }
     } else {
-      //Signup logic
+      // Signup logic
       const { data: existingUser } = await supabase
-      .from("users")
-      .select("email")
-      .eq("email", email)
-      .single();
-      if(existingUser){
-        console.error("User already exists")
-      }else{
-        const { data, error } = await supabase
         .from("users")
-        .insert([
-          {
-            email,
-            password, // WARNING: Storing password in plain text
-            name,
-            user_type: userType,
-          }
-        ])
-        .select();
-        console.log(data)
+        .select("email")
+        .eq("email", email)
+        .single();
 
-      if (error) {
-        console.error("Signup error:", error.message);
-        // Handle signup error (e.g., show error message to user)
-      } else if (data) {
-        // Signup successful
-        router.push("/login"); // Redirect to login page after successful signup
+      if (existingUser) {
+        setErrorMessage("User with this email already exists.");
+        console.error("User already exists");
+      } else {
+        const { data, error } = await supabase
+          .from("users")
+          .insert([
+            {
+              email,
+              password, // WARNING: Storing password in plain text
+              name,
+              user_type: userType,
+            },
+          ])
+          .select();
+
+        if (error) {
+          setErrorMessage("Signup failed. Please try again.");
+          console.error("Signup error:", error.message);
+        } else if (data) {
+          // Signup successful
+          router.push("/login"); // Redirect to login page after successful signup
+        }
       }
-      }
-     
     }
   };
   const setSession = (userId: string, email: string, hashedPassword: string, userType: "user" | "admin",name:string) => {
@@ -146,6 +150,13 @@ export default function LoginSignupPage() {
           >
             {isLogin ? "Login to EventFlow" : "Sign Up for EventFlow"}
           </h1>
+          {errorMessage && (
+            <Alert variant="destructive">
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{errorMessage}</AlertDescription>
+            </Alert>
+          )}
+          <br/>
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
               <RadioGroup
