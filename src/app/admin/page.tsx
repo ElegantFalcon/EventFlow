@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -75,7 +75,21 @@ export default function AdminPage() {
     venue: "",
     date: "",
     attendees: "",
+    organizer:"",
   });
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      const { data, error } = await supabase.from("events").select("*");
+      if (error) {
+        console.error("Error fetching events:", error.message);
+      } else {
+        setEvents(data);
+      }
+    };
+
+    fetchEvents();
+  }, []);
 
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
@@ -94,6 +108,7 @@ export default function AdminPage() {
       date: newEvent.date,
       image: newEvent.image || "default-image-url",
       attendees: parseInt(newEvent.attendees, 10) || 0,
+      organizer: newEvent.organizer,
     };
 
     // Send data to Supabase
@@ -111,7 +126,7 @@ export default function AdminPage() {
     }
 
     // Clear the form
-    setNewEvent({ image: "", name: "", venue: "", date: "", attendees: "" });
+    setNewEvent({ image: "", name: "", venue: "", date: "", attendees: "" ,organizer:""});
     setIsAddEventOpen(false);
   };
 
@@ -342,6 +357,21 @@ export default function AdminPage() {
                             ...newEvent,
                             attendees: e.target.value,
                           })
+                        }
+                        className={`col-span-3 ${
+                          isDarkMode ? "bg-gray-700 text-gray-100" : ""
+                        }`}
+                      />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="name" className="text-right">
+                        Organizer
+                      </Label>
+                      <Input
+                        id="name"
+                        value={newEvent.name}
+                        onChange={(e) =>
+                          setNewEvent({ ...newEvent, name: e.target.value })
                         }
                         className={`col-span-3 ${
                           isDarkMode ? "bg-gray-700 text-gray-100" : ""

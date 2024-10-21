@@ -53,29 +53,62 @@ export default function EventsPage() {
 
   const handleRegister = async (eventId: string) => {
     const userEmail = sessionStorage.getItem("email"); // Get the user's email from session storage
-
+  
     if (!userEmail) {
       console.error("User email not found in session storage.");
-      return; // You may want to handle this scenario with a message or redirect
+      return; // Handle the scenario if email is not found
     }
-
+  
+    // Fetch the current event data to check the attendees count
+    const { data: eventCurrent, error: eventFetchError } = await supabase
+      .from("events")
+      .select("attendees")
+      .eq("id", eventId)
+      .single();
+  
+    if (eventFetchError) {
+      console.error("Error fetching event data:", eventFetchError);
+      return; // Handle error
+    }
+  
+    // Check if attendees count is greater than 0
+    if (eventCurrent.attendees <= 0) {
+      console.error("No more attendees can be registered for this event.");
+      return; // Handle scenario when attendees are 0 or less
+    }
+  
     // Register the user for the event
-    const { data, error } = await supabase.from("registrations").insert([
+    const { data: registrationData, error: registrationError } = await supabase.from("registrations").insert([
       {
         event_id: eventId,
         user_email: userEmail,
         // Add additional fields if needed
       },
     ]);
-
-    if (error) {
-      console.error("Error registering for event:", error);
-      return; // You may want to show an error message to the user
+  
+    if (registrationError) {
+      console.error("Error registering for event:", registrationError);
+      return; // Handle the error appropriately
     }
-
+  
+    // Decrement the attendees count by 1
+    const updatedAttendeesCount = eventCurrent.attendees - 1;
+  
+    // Update the attendees count in the events table
+    const { data: eventData, error: eventError } = await supabase
+      .from("events")
+      .update({ attendees: updatedAttendeesCount }) // Set the updated attendees count
+      .eq("id", eventId);
+  
+    if (eventError) {
+      console.error("Error updating attendees count:", eventError);
+      return; // Handle the error appropriately
+    }
+  
     // Redirect to success page
     router.push("/success"); // Adjust the path as necessary
   };
+  
 
   return (
     <div
@@ -144,8 +177,7 @@ export default function EventsPage() {
                 <div className="flex-shrink-0">
                   <Image
                     className="h-48 w-full object-cover"
-                    src=""// Use event image for the image source
-                    alt={event.name}
+                    src={event.image?.startsWith("http") ? event.image : "/default-image.jpg"} // Use a fallback image                    alt={event.name}
                     width={event.width || 500}
                     height={event.height || 300}
                   />

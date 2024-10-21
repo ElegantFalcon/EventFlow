@@ -19,10 +19,12 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Image from "next/image";
 import Navbar from "@/components/navbar";
+import { useRouter } from "next/navigation";
 
 export default function EnhancedLandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const router = useRouter();
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
@@ -79,6 +81,7 @@ export default function EnhancedLandingPage() {
                       ? "bg-indigo-600 hover:bg-indigo-700"
                       : "bg-indigo-600 hover:bg-indigo-700 text-white"
                   }`}
+                  onClick={() => router.push("/login")}
                 >
                   Get Started
                   <ArrowRight className="ml-2 h-5 w-5" />
@@ -91,6 +94,7 @@ export default function EnhancedLandingPage() {
                       ? "border-gray-700 hover:bg-gray-800"
                       : "border-gray-300 hover:bg-gray-100"
                   }`}
+                  onClick={() => router.push("/features")}
                 >
                   Learn More
                 </Button>
@@ -342,6 +346,7 @@ export default function EnhancedLandingPage() {
                         ? "bg-indigo-600 hover:bg-indigo-700"
                         : "bg-indigo-600 hover:bg-indigo-700 text-white"
                     }
+                    onClick={() => router.push("/login")}
                   >
                     Get Started
                     <ChevronRight className="ml-2 h-4 w-4" />
