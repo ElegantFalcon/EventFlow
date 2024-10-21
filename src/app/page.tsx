@@ -22,6 +22,7 @@ import Navbar from "@/components/navbar";
 import { useRouter } from "next/navigation";
 
 export default function EnhancedLandingPage() {
+  
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const router = useRouter();

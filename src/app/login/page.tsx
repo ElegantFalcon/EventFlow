@@ -1,27 +1,17 @@
 "use client";
 import Cookies from "js-cookie";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Moon,
-  Sun,
-  Mail,
-  Lock,
-  User,
-  ArrowRight,
-} from "lucide-react";
+import { Moon, Sun, Mail, Lock, User, ArrowRight } from "lucide-react";
 import Navbar from "@/components/navbar";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-
-
-
 
 // WARNING: This implementation stores passwords in plain text, which is a severe security risk.
 // This approach should NOT be used in a production environment.
@@ -33,12 +23,13 @@ export default function LoginSignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [username, setUsername] = useState<string | "">(""); 
+  const [username, setUsername] = useState<string | "">("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
 
- useEffect(() => {
-    const storedUsername = sessionStorage.getItem("name") || Cookies.get("name");
+  useEffect(() => {
+    const storedUsername =
+      sessionStorage.getItem("name") || Cookies.get("name");
     if (storedUsername) {
       setUsername(storedUsername);
     }
@@ -64,7 +55,13 @@ export default function LoginSignupPage() {
         console.error("Login error:", error.message);
       } else if (data) {
         // Login successful
-        setSession(data.id, data.email, data.password, data.user_type, data.name);
+        setSession(
+          data.id,
+          data.email,
+          data.password,
+          data.user_type,
+          data.name
+        );
         setUsername(data.name);
         if (data.user_type === "admin") {
           router.push("/admin");
@@ -109,21 +106,27 @@ export default function LoginSignupPage() {
       }
     }
   };
-  const setSession = (userId: string, email: string, hashedPassword: string, userType: "user" | "admin",name:string) => {
+  const setSession = (
+    userId: string,
+    email: string,
+    hashedPassword: string,
+    userType: "user" | "admin",
+    name: string
+  ) => {
     // Set session storage
     sessionStorage.setItem("userId", userId);
     sessionStorage.setItem("email", email);
     sessionStorage.setItem("hashedPassword", hashedPassword);
     sessionStorage.setItem("userType", userType);
     sessionStorage.setItem("name", name);
-   
+
     Cookies.set("userId", userId, { expires: 1 }); // Set expiration for 1 day
     Cookies.set("email", email, { expires: 1 });
     Cookies.set("hashedPassword", hashedPassword, { expires: 1 });
     Cookies.set("userType", userType, { expires: 1 });
     console.log("Session successfully created for user:", name);
   };
-  
+
   return (
     <div
       className={`flex flex-col min-h-screen ${
@@ -132,7 +135,7 @@ export default function LoginSignupPage() {
           : "bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 text-gray-900"
       }`}
     >
-      <Navbar isDarkMode={isDarkMode} toggleTheme={toggleTheme} username={username}  />
+      <Navbar isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 
       <main className="flex-1 flex items-center justify-center p-4">
         <motion.div
@@ -156,7 +159,7 @@ export default function LoginSignupPage() {
               <AlertDescription>{errorMessage}</AlertDescription>
             </Alert>
           )}
-          <br/>
+          <br />
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
               <RadioGroup

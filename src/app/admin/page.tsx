@@ -1,6 +1,6 @@
 "use client";
 
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -57,7 +57,6 @@ const initialEvents = [
   { name: "Food & Wine Expo", date: "2023-08-05", attendees: 2000 },
   { name: "Art Gallery Opening", date: "2023-10-01", attendees: 300 },
   {
-    
     name: "Startup Pitch Competition",
     date: "2023-11-12",
     attendees: 150,
@@ -75,7 +74,7 @@ export default function AdminPage() {
     venue: "",
     date: "",
     attendees: "",
-    organizer:"",
+    organizer: "",
   });
 
   useEffect(() => {
@@ -126,7 +125,14 @@ export default function AdminPage() {
     }
 
     // Clear the form
-    setNewEvent({ image: "", name: "", venue: "", date: "", attendees: "" ,organizer:""});
+    setNewEvent({
+      image: "",
+      name: "",
+      venue: "",
+      date: "",
+      attendees: "",
+      organizer: "",
+    });
     setIsAddEventOpen(false);
   };
 
@@ -196,54 +202,6 @@ export default function AdminPage() {
           >
             Admin Dashboard
           </h1>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <Card className={isDarkMode ? "bg-gray-800" : "bg-white"}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Total Events
-                </CardTitle>
-                <Calendar
-                  className={`h-4 w-4 ${
-                    isDarkMode ? "text-indigo-400" : "text-indigo-600"
-                  }`}
-                />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{events.length}</div>
-                <p
-                  className={`text-xs ${
-                    isDarkMode ? "text-gray-400" : "text-gray-500"
-                  }`}
-                >
-                  +2 from last month
-                </p>
-              </CardContent>
-            </Card>
-            <Card className={isDarkMode ? "bg-gray-800" : "bg-white"}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Total Attendees
-                </CardTitle>
-                <BarChart
-                  className={`h-4 w-4 ${
-                    isDarkMode ? "text-indigo-400" : "text-indigo-600"
-                  }`}
-                />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {events.reduce((sum, event) => sum + event.attendees, 0)}
-                </div>
-                <p
-                  className={`text-xs ${
-                    isDarkMode ? "text-gray-400" : "text-gray-500"
-                  }`}
-                >
-                  +20% from last month
-                </p>
-              </CardContent>
-            </Card>
-          </div>
         </motion.div>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -368,10 +326,10 @@ export default function AdminPage() {
                         Organizer
                       </Label>
                       <Input
-                        id="name"
-                        value={newEvent.name}
+                        id="organizer"
+                        value={newEvent.organizer}
                         onChange={(e) =>
-                          setNewEvent({ ...newEvent, name: e.target.value })
+                          setNewEvent({ ...newEvent, organizer: e.target.value })
                         }
                         className={`col-span-3 ${
                           isDarkMode ? "bg-gray-700 text-gray-100" : ""
@@ -412,9 +370,7 @@ export default function AdminPage() {
                 <TableHead className={isDarkMode ? "text-gray-300" : ""}>
                   Attendees
                 </TableHead>
-                <TableHead className={isDarkMode ? "text-gray-300" : ""}>
-                  Actions
-                </TableHead>
+                
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -436,24 +392,7 @@ export default function AdminPage() {
                   <TableCell className={isDarkMode ? "text-gray-300" : ""}>
                     {event.attendees}
                   </TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <Button variant="ghost" size="icon">
-                        <Edit
-                          className={`h-4 w-4 ${
-                            isDarkMode ? "text-gray-300" : "text-gray-500"
-                          }`}
-                        />
-                      </Button>
-                      <Button variant="ghost" size="icon">
-                        <Trash
-                          className={`h-4 w-4 ${
-                            isDarkMode ? "text-gray-300" : "text-gray-500"
-                          }`}
-                        />
-                      </Button>
-                    </div>
-                  </TableCell>
+                  
                 </TableRow>
               ))}
             </TableBody>
