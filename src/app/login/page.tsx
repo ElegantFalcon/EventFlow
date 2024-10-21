@@ -12,6 +12,7 @@ import Navbar from "@/components/navbar";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import Swal from 'sweetalert2'
 
 // WARNING: This implementation stores passwords in plain text, which is a severe security risk.
 // This approach should NOT be used in a production environment.
@@ -101,7 +102,17 @@ export default function LoginSignupPage() {
           console.error("Signup error:", error.message);
         } else if (data) {
           // Signup successful
-          router.push("/login"); // Redirect to login page after successful signup
+          await Swal.fire({
+            title: 'Success!',
+            text: 'Your account has been created successfully. Please log in.',
+            icon: 'success',
+            position: 'bottom-left',
+            toast: true,
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          });
+         // Redirect to login page after successful signup
         }
       }
     }
